@@ -1,3 +1,10 @@
 # Ignore MacOS system files
 .DS_Store
 dev/
+
+# Video-Claw local runtime state (contains API keys and generated media)
+video-claw/video-claw/backend/config.yaml
+video-claw/video-claw/backend/code/
+video-claw/video-claw/backend/temp/
+video-claw/video-claw/backend/venv/
+video-claw/video-claw/backend/.venv/

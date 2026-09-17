@@ -1,0 +1,36 @@
+# Video-Claw container deployment (software encoding, no GPU required).
+#
+# Usage:
+#   docker compose up -d --build
+#   Frontend: http://localhost:3000
+#   Backend:  http://localhost:8000/api/health
+#
+# API keys go in backend/config.yaml (or via the web UI). If the file does not
+# exist yet, copy it on the host first: cp backend/config.yaml.example backend/config.yaml
+
+services:
+  backend:
+    build: ./backend
+    container_name: video-claw-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Keeps config.yaml, session state and generated media on the host.
+      - ./backend:/app
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Server-side rewrites run inside the compose network.
+        BACKEND_URL: http://backend:8000
+        # Baked into the browser bundle; override for remote access, e.g.
+        # NEXT_PUBLIC_API_URL=http://192.168.1.10:8000 docker compose up -d --build
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    container_name: video-claw-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
